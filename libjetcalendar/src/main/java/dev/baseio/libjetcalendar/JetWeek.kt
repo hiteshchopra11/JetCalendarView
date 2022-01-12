@@ -1,12 +1,13 @@
-package dev.baseio.libjetcalendar.week
+package dev.baseio.libjetcalendar
 
 import java.util.*
 
 data class JetWeek(val startDate: Date, val endDate: Date) {
 
   companion object {
-    fun current(): JetWeek {
+    fun current(date: Date = Date()): JetWeek {
       return Calendar.getInstance().run {
+        time = date
         set(Calendar.DAY_OF_WEEK, 1)
         val startDate = this.time
         set(Calendar.DAY_OF_WEEK, 7)
@@ -28,6 +29,7 @@ fun JetWeek.dates(): List<JetDay> {
 
 fun Date.toJetWeekDay(): JetDay {
   return Calendar.getInstance().run {
+    time = this@toJetWeekDay
     val year: Int = get(Calendar.YEAR)
     val month: Int = get(Calendar.MONTH) + 1
     val day: Int = get(Calendar.DAY_OF_MONTH)
