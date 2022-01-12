@@ -1,9 +1,16 @@
 package dev.baseio.libjetcalendar
 
+import java.text.DateFormatSymbols
 import java.util.*
 
 
 class JetMonth(val startDate: Date, val endDate: Date) {
+  fun name(): String {
+    return Calendar.getInstance().run {
+      time = startDate
+      DateFormatSymbols().months[get(Calendar.MONTH)]
+    }
+  }
 
   companion object {
     fun current(date: Date = Date()): JetMonth {

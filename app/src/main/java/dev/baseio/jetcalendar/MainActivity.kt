@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import dev.baseio.jetcalendar.ui.theme.JetCalendarSampleTheme
+import dev.baseio.libjetcalendar.monthly.JetCalendarMonthlyView
 import dev.baseio.libjetcalendar.weekly.JetCalendarWeekView
 
 class MainActivity : ComponentActivity() {
@@ -28,7 +29,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Greeting(name: String) {
-  JetCalendarWeekView(modifier = Modifier)
+  JetCalendarMonthlyView()
 }
 
 @Preview(showBackground = true)
