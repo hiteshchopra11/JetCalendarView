@@ -8,14 +8,14 @@ data class JetWeek(
   val monthOfWeek: Int,
 ) {
   companion object {
-    fun current(date: Date = Date(), monthOfWeek: Int = date.getDateMonth()): JetWeek {
+    fun current(date: Date = Date()): JetWeek {
       return Calendar.getInstance().run {
         time = date
         set(Calendar.DAY_OF_WEEK, 1)
         val startDate = this.time
         set(Calendar.DAY_OF_WEEK, 7)
         val endDate = this.time
-        JetWeek(startDate, endDate, monthOfWeek)
+        JetWeek(startDate, endDate, date.getDateMonth())
       }
     }
   }

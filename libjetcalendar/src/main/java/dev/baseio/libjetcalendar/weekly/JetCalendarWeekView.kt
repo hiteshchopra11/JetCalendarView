@@ -11,6 +11,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import dev.baseio.libjetcalendar.data.JetWeek
 import dev.baseio.libjetcalendar.data.dates
 import java.util.*
@@ -30,7 +31,7 @@ fun JetCalendarWeekView(modifier: Modifier, week: JetWeek = JetWeek.current(Date
         Text(
           text = date.day.toString(),
           modifier = Modifier.padding(4.dp),
-          style = TextStyle(color = if (date.isIncludeMonth) Color.Black else Color.LightGray)
+          style = TextStyle( fontSize = 18.sp,color = if (date.isPartOfMonth) Color.Black else Color.LightGray)
         )
       }
     }

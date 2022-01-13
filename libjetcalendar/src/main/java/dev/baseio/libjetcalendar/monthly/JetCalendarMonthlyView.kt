@@ -21,7 +21,7 @@ fun JetCalendarMonthlyView(jetMonth: JetMonth = JetMonth.current()) {
     verticalArrangement = Arrangement.SpaceAround,
     horizontalAlignment = Alignment.CenterHorizontally
   ) {
-    Text(text = jetMonth.name(), style = TextStyle(fontSize = 16.sp), modifier = Modifier.padding(8.dp))
+    Text(text = jetMonth.name(), style = TextStyle(fontSize = 18.sp), modifier = Modifier.padding(8.dp))
     jetMonth.weeks().forEach { week ->
       JetCalendarWeekView(modifier = Modifier.fillMaxWidth(), week = week)
     }
