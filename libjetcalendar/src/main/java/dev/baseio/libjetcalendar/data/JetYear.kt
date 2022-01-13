@@ -29,10 +29,10 @@ fun JetYear.months(): List<JetMonth> {
     var endDateMonth = this.time
     var currentYear = get(Calendar.YEAR)
     while (true) {
-      months.add(JetMonth(startDateMonth, endDateMonth))
+      months.add(JetMonth(startDateMonth, endDateMonth, startDateMonth))
       add(Calendar.DAY_OF_YEAR, 1)
-      if (get(Calendar.DAY_OF_YEAR) > currentYear) {
-        break;
+      if (get(Calendar.YEAR) > currentYear) {
+        break
       }
       startDateMonth = this.time
       val newDays = getActualMaximum(Calendar.DAY_OF_MONTH)

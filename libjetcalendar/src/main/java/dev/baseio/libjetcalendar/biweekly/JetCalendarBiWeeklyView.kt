@@ -6,9 +6,10 @@ import androidx.compose.ui.Modifier
 import dev.baseio.libjetcalendar.weekly.JetCalendarWeekView
 import dev.baseio.libjetcalendar.data.JetWeek
 import dev.baseio.libjetcalendar.data.nextWeek
+import java.util.*
 
 @Composable
-fun JetCalendarBiWeeklyView(weekOne: JetWeek = JetWeek.current()) {
+fun JetCalendarBiWeeklyView(weekOne: JetWeek = JetWeek.current(Date(), Date())) {
   Column {
     val nextWeek = weekOne.nextWeek()
     JetCalendarWeekView(modifier = Modifier, week = weekOne)

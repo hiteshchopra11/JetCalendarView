@@ -2,17 +2,20 @@ package dev.baseio.libjetcalendar.data
 
 import java.util.*
 
-data class JetWeek(val startDate: Date, val endDate: Date) {
-
+data class JetWeek(
+  val startDate: Date,
+  val endDate: Date,
+  val focusedDateOfMonth: Date,
+) {
   companion object {
-    fun current(date: Date = Date()): JetWeek {
+    fun current(date: Date = Date(), focusedDate: Date): JetWeek {
       return Calendar.getInstance().run {
         time = date
         set(Calendar.DAY_OF_WEEK, 1)
         val startDate = this.time
         set(Calendar.DAY_OF_WEEK, 7)
         val endDate = this.time
-        JetWeek(startDate, endDate)
+        JetWeek(startDate, endDate, focusedDate)
       }
     }
   }
@@ -20,30 +23,42 @@ data class JetWeek(val startDate: Date, val endDate: Date) {
 
 fun JetWeek.dates(): List<JetDay> {
   val weekDates = mutableListOf<JetDay>()
-  weekDates.add(startDate.toJetWeekDay())
+  weekDates.add(startDate.toJetDay(this))
   while (weekDates.size != 7) {
-    weekDates.add(weekDates.last().addDays(1))
+    weekDates.add(weekDates.last().nextDay(this))
   }
   return weekDates
 }
 
-fun Date.toJetWeekDay(): JetDay {
+fun Date.toJetDay(jetWeek: JetWeek): JetDay {
   return Calendar.getInstance().run {
-    time = this@toJetWeekDay
+    time = this@toJetDay
     val year: Int = get(Calendar.YEAR)
     val month: Int = get(Calendar.MONTH) + 1
     val day: Int = get(Calendar.DAY_OF_MONTH)
-    JetDay(year, month, day)
+    JetDay(
+      year,
+      month,
+      day,
+      get(Calendar.MONTH) == jetWeek.focusedDateOfMonth.getDateMonth()
+    )
   }
 }
 
-private fun JetDay.addDays(days: Int): JetDay {
+private fun Date.getDateMonth(): Int {
   return Calendar.getInstance().run {
-    set(Calendar.YEAR, this@addDays.year)
-    set(Calendar.MONTH, this@addDays.month - 1)
-    set(Calendar.DAY_OF_MONTH, this@addDays.day)
-    add(Calendar.DAY_OF_YEAR, days)
-    this.time.toJetWeekDay()
+    time = this@getDateMonth
+    get(Calendar.MONTH)
+  }
+}
+
+private fun JetDay.nextDay(jetWeek: JetWeek): JetDay {
+  return Calendar.getInstance().run {
+    set(Calendar.YEAR, this@nextDay.year)
+    set(Calendar.MONTH, this@nextDay.month - 1)
+    set(Calendar.DAY_OF_MONTH, this@nextDay.day)
+    add(Calendar.DAY_OF_YEAR, 1)
+    this.time.toJetDay(jetWeek)
   }
 }
 
@@ -54,7 +69,7 @@ fun JetWeek.nextWeek(): JetWeek {
     val startDateNew = this.time
     add(Calendar.DAY_OF_YEAR, 6)
     val endDateNew = this.time
-    JetWeek(startDateNew, endDateNew)
+    JetWeek(startDateNew, endDateNew, focusedDateOfMonth)
   }
 }
 
@@ -65,6 +80,6 @@ fun JetWeek.previousWeek(): JetWeek {
     val endDateNew = this.time
     add(Calendar.DAY_OF_YEAR, -6)
     val startDateNew = this.time
-    JetWeek(startDateNew, endDateNew)
+    JetWeek(startDateNew, endDateNew, focusedDateOfMonth)
   }
 }

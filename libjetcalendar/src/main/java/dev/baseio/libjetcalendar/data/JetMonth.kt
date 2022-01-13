@@ -4,14 +4,13 @@ import java.text.DateFormatSymbols
 import java.util.*
 
 
-class JetMonth(val startDate: Date, val endDate: Date) {
+class JetMonth(val startDate: Date, val endDate: Date, val focusedDate: Date) {
   fun name(): String {
     return Calendar.getInstance().run {
       time = startDate
-      DateFormatSymbols().months[get(Calendar.MONTH)]
+      "${DateFormatSymbols().months[get(Calendar.MONTH)]} ${get(Calendar.YEAR)}"
     }
   }
-
 
 
   companion object {
@@ -31,7 +30,7 @@ class JetMonth(val startDate: Date, val endDate: Date) {
         this[Calendar.SECOND] = 59
         val endDate = this.time
 
-        JetMonth(startDate, endDate)
+        JetMonth(startDate, endDate, focusedDate = date)
       }
     }
   }
@@ -43,45 +42,11 @@ fun JetMonth.weeks(): List<JetWeek> {
     getActualMaximum(Calendar.WEEK_OF_MONTH)
   }
   val monthWeeks = mutableListOf<JetWeek>()
-  monthWeeks.add(JetWeek.current(this@weeks.startDate))
+  monthWeeks.add(JetWeek.current(this@weeks.startDate, focusedDate))
   while (monthWeeks.size != weeks) {
     monthWeeks.add(monthWeeks.last().nextWeek())
   }
   return monthWeeks
-}
-
-fun JetMonth.dates(): List<JetDay> {
-  val days = Calendar.getInstance().run {
-    time = this@dates.startDate
-    getActualMaximum(Calendar.DAY_OF_MONTH)
-  }
-
-  val monthDates = mutableListOf<JetDay>()
-  monthDates.add(startDate.toJetMonthDay())
-  while (monthDates.size != days) {
-    monthDates.add(monthDates.last().addDays(1))
-  }
-  return monthDates
-}
-
-fun Date.toJetMonthDay(): JetDay {
-  return Calendar.getInstance().run {
-    time = this@toJetMonthDay
-    val year: Int = get(Calendar.YEAR)
-    val month: Int = get(Calendar.MONTH) + 1
-    val day: Int = get(Calendar.DAY_OF_MONTH)
-    JetDay(year, month, day)
-  }
-}
-
-private fun JetDay.addDays(days: Int): JetDay {
-  return Calendar.getInstance().run {
-    set(Calendar.YEAR, this@addDays.year)
-    set(Calendar.MONTH, this@addDays.month - 1)
-    set(Calendar.DAY_OF_MONTH, this@addDays.day)
-    add(Calendar.DAY_OF_YEAR, days)
-    this.time.toJetMonthDay()
-  }
 }
 
 fun JetMonth.nextMonth(): JetMonth {
@@ -93,6 +58,6 @@ fun JetMonth.nextMonth(): JetMonth {
     val days = getActualMaximum(Calendar.DAY_OF_MONTH)
     set(Calendar.DAY_OF_MONTH, days)
     val endDateNew = this.time
-    JetMonth(startDateNew, endDateNew)
+    JetMonth(startDateNew, endDateNew, startDateNew)
   }
 }
