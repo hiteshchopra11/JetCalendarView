@@ -19,20 +19,38 @@ fun JetCalendarYearlyView(
   selectedDates: Set<JetDay>,
 ) {
 
-  val monthsSaver = listSaver<List<JetMonth>, Any>(save = {
-    it
-  }, restore = {
-    it.map { month -> month as JetMonth }
-  })
-
-  val state by rememberSaveable(stateSaver = monthsSaver) {
+  val state by rememberSaveable(stateSaver = monthsListSaver()) {
     mutableStateOf(startingYear.months())
   }
+  val lazyListState = LazyListState(
+    startingYear.currentMonth(),
+  )
+  val listState = rememberSaveable(saver = lazyListStateSaver(lazyListState)) {
+    lazyListState
+  }
 
-  LazyColumn(state = LazyListState(startingYear.currentMonth())) {
+  LazyColumn(state = listState) {
     items(state) { month ->
       JetCalendarMonthlyView(month, onDateSelected, selectedDates)
     }
   }
 
 }
+
+@Composable
+private fun monthsListSaver() = listSaver<List<JetMonth>, Any>(save = {
+  it
+}, restore = {
+  it.map { month -> month as JetMonth }
+})
+
+@Composable
+private fun lazyListStateSaver(lazyListState: LazyListState) =
+  listSaver<LazyListState, Int>(
+    save = { listOf(lazyListState.firstVisibleItemIndex) },
+    restore = {
+      LazyListState(
+        firstVisibleItemIndex = it[0],
+      )
+    }
+  )

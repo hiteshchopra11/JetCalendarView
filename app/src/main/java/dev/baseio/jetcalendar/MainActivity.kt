@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun CalendarExample() {
-  var stateFlow by rememberSaveable { mutableStateOf(hashSetOf<JetDay>()) }
+  var stateFlow by rememberSaveable { mutableStateOf(setOf<JetDay>()) }
   JetCalendar(modifier = Modifier, onDateSelected = { jetDay ->
     stateFlow = hashSetOf<JetDay>().apply {
       addAll(stateFlow)
