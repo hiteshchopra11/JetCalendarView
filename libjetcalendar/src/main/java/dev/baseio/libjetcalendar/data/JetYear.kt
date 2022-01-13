@@ -3,6 +3,12 @@ package dev.baseio.libjetcalendar.data
 import java.util.*
 
 class JetYear(val startDate: Date, val endDate: Date) {
+  fun currentMonth(): Int {
+    return Calendar.getInstance().run {
+      time = startDate
+      get(Calendar.MONTH)
+    }
+  }
 
   companion object {
     fun current(date: Date = Date()): JetYear {

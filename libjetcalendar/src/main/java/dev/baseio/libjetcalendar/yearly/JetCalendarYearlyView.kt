@@ -1,6 +1,7 @@
 package dev.baseio.libjetcalendar.yearly
 
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.*
 import dev.baseio.libjetcalendar.data.JetDay
@@ -19,7 +20,7 @@ fun JetCalendarYearlyView(
     MutableStateFlow(startingYear.months())
   }
   val months by state.collectAsState()
-  LazyColumn {
+  LazyColumn(state = LazyListState(startingYear.currentMonth())) {
     items(months) { month ->
       JetCalendarMonthlyView(month, onDateSelected, selectedDates)
     }
