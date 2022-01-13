@@ -1,12 +1,15 @@
 package dev.baseio.libjetcalendar.data
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.util.*
 
+@Parcelize
 data class JetWeek(
   val startDate: Date,
   val endDate: Date,
   val monthOfWeek: Int,
-) {
+) : Parcelable {
   companion object {
     fun current(date: Date = Date()): JetWeek {
       return Calendar.getInstance().run {

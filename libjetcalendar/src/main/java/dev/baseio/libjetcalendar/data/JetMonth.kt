@@ -1,10 +1,13 @@
 package dev.baseio.libjetcalendar.data
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.text.DateFormatSymbols
 import java.util.*
 
 
-class JetMonth(val startDate: Date, val endDate: Date) {
+@Parcelize
+class JetMonth(val startDate: Date, val endDate: Date) : Parcelable {
   fun name(): String {
     return Calendar.getInstance().run {
       time = startDate

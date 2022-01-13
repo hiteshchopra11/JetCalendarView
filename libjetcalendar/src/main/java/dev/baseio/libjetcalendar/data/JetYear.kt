@@ -1,8 +1,11 @@
 package dev.baseio.libjetcalendar.data
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.util.*
 
-class JetYear(val startDate: Date, val endDate: Date) {
+@Parcelize
+class JetYear(private val startDate: Date, val endDate: Date) : Parcelable {
   fun currentMonth(): Int {
     return Calendar.getInstance().run {
       time = startDate
