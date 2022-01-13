@@ -8,11 +8,10 @@ import dev.baseio.libjetcalendar.data.JetWeek
 import dev.baseio.libjetcalendar.data.nextWeek
 
 @Composable
-fun JetCalendarBiWeeklyView() {
+fun JetCalendarBiWeeklyView(weekOne: JetWeek = JetWeek.current()) {
   Column {
-    val week = JetWeek.current()
-    val nextWeek = week.nextWeek()
-    JetCalendarWeekView(modifier = Modifier, week = week)
+    val nextWeek = weekOne.nextWeek()
+    JetCalendarWeekView(modifier = Modifier, week = weekOne)
     JetCalendarWeekView(modifier = Modifier, week = nextWeek)
   }
 }

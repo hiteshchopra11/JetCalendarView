@@ -12,6 +12,8 @@ class JetMonth(val startDate: Date, val endDate: Date) {
     }
   }
 
+
+
   companion object {
     fun current(date: Date = Date()): JetMonth {
       return Calendar.getInstance().run {
