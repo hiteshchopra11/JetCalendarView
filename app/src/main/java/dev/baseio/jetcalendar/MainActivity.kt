@@ -5,14 +5,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import dev.baseio.jetcalendar.ui.theme.JetCalendarSampleTheme
 import dev.baseio.libjetcalendar.JetCalendar
-import dev.baseio.libjetcalendar.monthly.JetCalendarMonthlyView
-import dev.baseio.libjetcalendar.weekly.JetCalendarWeekView
+import dev.baseio.libjetcalendar.data.JetDay
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
       JetCalendarSampleTheme {
         // A surface container using the 'background' color from the theme
         Surface(color = MaterialTheme.colors.background) {
-          Greeting("Android")
+          CalendarExample()
         }
       }
     }
@@ -29,14 +29,20 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String) {
-  JetCalendar(modifier = Modifier)
+fun CalendarExample() {
+  var stateFlow by rememberSaveable { mutableStateOf(hashSetOf<JetDay>()) }
+  JetCalendar(modifier = Modifier, onDateSelected = { jetDay ->
+    stateFlow = hashSetOf<JetDay>().apply {
+      addAll(stateFlow)
+      add(jetDay)
+    }
+  }, selectedDates = stateFlow)
 }
 
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
   JetCalendarSampleTheme {
-    Greeting("Android")
+    CalendarExample()
   }
 }
