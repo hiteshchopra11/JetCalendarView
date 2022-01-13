@@ -42,7 +42,7 @@ fun JetMonth.weeks(): List<JetWeek> {
     getActualMaximum(Calendar.WEEK_OF_MONTH)
   }
   val monthWeeks = mutableListOf<JetWeek>()
-  monthWeeks.add(JetWeek.current(this@weeks.startDate, focusedDate))
+  monthWeeks.add(JetWeek.current(this@weeks.startDate))
   while (monthWeeks.size != weeks) {
     monthWeeks.add(monthWeeks.last().nextWeek())
   }

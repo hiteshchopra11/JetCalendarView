@@ -20,8 +20,8 @@ fun JetCalendar(
 ) {
   when (viewType) {
     JetViewType.MONTHLY -> JetCalendarMonthlyView(jetMonth = JetMonth.current(today))
-    JetViewType.WEEKLY -> JetCalendarWeekView(modifier = modifier, week = JetWeek.current(today,today))
-    JetViewType.BI_WEEKLY -> JetCalendarBiWeeklyView(weekOne = JetWeek.current(today,today))
+    JetViewType.WEEKLY -> JetCalendarWeekView(modifier = modifier, week = JetWeek.current(today))
+    JetViewType.BI_WEEKLY -> JetCalendarBiWeeklyView(weekOne = JetWeek.current(today))
     JetViewType.YEARLY -> JetCalendarYearlyView(startingYear = JetYear.current(today))
   }
 }

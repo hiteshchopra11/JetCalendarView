@@ -5,17 +5,17 @@ import java.util.*
 data class JetWeek(
   val startDate: Date,
   val endDate: Date,
-  val focusedDateOfMonth: Date,
+  val monthOfWeek: Int,
 ) {
   companion object {
-    fun current(date: Date = Date(), focusedDate: Date): JetWeek {
+    fun current(date: Date = Date(), monthOfWeek: Int = date.getDateMonth()): JetWeek {
       return Calendar.getInstance().run {
         time = date
         set(Calendar.DAY_OF_WEEK, 1)
         val startDate = this.time
         set(Calendar.DAY_OF_WEEK, 7)
         val endDate = this.time
-        JetWeek(startDate, endDate, focusedDate)
+        JetWeek(startDate, endDate, monthOfWeek)
       }
     }
   }
@@ -40,7 +40,7 @@ fun Date.toJetDay(jetWeek: JetWeek): JetDay {
       year,
       month,
       day,
-      get(Calendar.MONTH) == jetWeek.focusedDateOfMonth.getDateMonth()
+      get(Calendar.MONTH) == jetWeek.monthOfWeek,
     )
   }
 }
@@ -69,7 +69,7 @@ fun JetWeek.nextWeek(): JetWeek {
     val startDateNew = this.time
     add(Calendar.DAY_OF_YEAR, 6)
     val endDateNew = this.time
-    JetWeek(startDateNew, endDateNew, focusedDateOfMonth)
+    JetWeek(startDateNew, endDateNew, monthOfWeek)
   }
 }
 
@@ -80,6 +80,6 @@ fun JetWeek.previousWeek(): JetWeek {
     val endDateNew = this.time
     add(Calendar.DAY_OF_YEAR, -6)
     val startDateNew = this.time
-    JetWeek(startDateNew, endDateNew, focusedDateOfMonth)
+    JetWeek(startDateNew, endDateNew, monthOfWeek)
   }
 }
