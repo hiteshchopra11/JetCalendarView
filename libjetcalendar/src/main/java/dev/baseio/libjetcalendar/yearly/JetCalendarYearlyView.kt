@@ -23,7 +23,7 @@ fun JetCalendarYearlyView(
     mutableStateOf(startingYear.months())
   }
   val lazyListState = LazyListState(
-    startingYear.currentMonth(),
+    startingYear.currentMonthPosition(),
   )
   val listState = rememberSaveable(saver = lazyListStateSaver(lazyListState)) {
     lazyListState

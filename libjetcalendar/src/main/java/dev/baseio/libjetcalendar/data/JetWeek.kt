@@ -2,24 +2,25 @@ package dev.baseio.libjetcalendar.data
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.temporal.TemporalAdjusters
+import java.time.temporal.WeekFields
 import java.util.*
 
 @Parcelize
 data class JetWeek(
-  val startDate: Date,
-  val endDate: Date,
+  val startDate: LocalDate,
+  val endDate: LocalDate,
   val monthOfWeek: Int,
 ) : Parcelable {
   companion object {
-    fun current(date: Date = Date()): JetWeek {
-      return Calendar.getInstance().run {
-        time = date
-        set(Calendar.DAY_OF_WEEK, 1)
-        val startDate = this.time
-        set(Calendar.DAY_OF_WEEK, 7)
-        val endDate = this.time
-        JetWeek(startDate, endDate, date.getDateMonth())
-      }
+    fun current(date: LocalDate = LocalDate.now()): JetWeek {
+      val firstDayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek
+      val startOfCurrentWeek: LocalDate = date.with(TemporalAdjusters.previousOrSame(firstDayOfWeek))
+      val lastDayOfWeek = firstDayOfWeek.plus(6) // or minus(1)
+      val endOfWeek: LocalDate = date.with(TemporalAdjusters.nextOrSame(lastDayOfWeek))
+      return JetWeek(startOfCurrentWeek, endOfWeek, date.monthValue)
     }
   }
 }
@@ -33,56 +34,15 @@ fun JetWeek.dates(): List<JetDay> {
   return weekDates
 }
 
-fun Date.toJetDay(jetWeek: JetWeek): JetDay {
-  return Calendar.getInstance().run {
-    time = this@toJetDay
-    val year: Int = get(Calendar.YEAR)
-    val month: Int = get(Calendar.MONTH) + 1
-    val day: Int = get(Calendar.DAY_OF_MONTH)
-    JetDay(
-      year,
-      month,
-      day,
-      get(Calendar.MONTH) == jetWeek.monthOfWeek,
-    )
-  }
-}
-
-private fun Date.getDateMonth(): Int {
-  return Calendar.getInstance().run {
-    time = this@getDateMonth
-    get(Calendar.MONTH)
-  }
+fun LocalDate.toJetDay(jetWeek: JetWeek): JetDay {
+  return JetDay(this, this.monthValue == jetWeek.monthOfWeek)
 }
 
 private fun JetDay.nextDay(jetWeek: JetWeek): JetDay {
-  return Calendar.getInstance().run {
-    set(Calendar.YEAR, this@nextDay.year)
-    set(Calendar.MONTH, this@nextDay.month - 1)
-    set(Calendar.DAY_OF_MONTH, this@nextDay.day)
-    add(Calendar.DAY_OF_YEAR, 1)
-    this.time.toJetDay(jetWeek)
-  }
+  return JetDay(this.date.plusDays(1), this.date.plusDays(1).monthValue == jetWeek.monthOfWeek)
 }
 
 fun JetWeek.nextWeek(): JetWeek {
-  return Calendar.getInstance().run {
-    time = this@nextWeek.endDate
-    add(Calendar.DAY_OF_YEAR, 1)
-    val startDateNew = this.time
-    add(Calendar.DAY_OF_YEAR, 6)
-    val endDateNew = this.time
-    JetWeek(startDateNew, endDateNew, monthOfWeek)
-  }
+  return JetWeek(this.endDate.plusDays(1), this.endDate.plusDays(7), monthOfWeek = monthOfWeek)
 }
 
-fun JetWeek.previousWeek(): JetWeek {
-  return Calendar.getInstance().run {
-    time = this@previousWeek.startDate
-    add(Calendar.DAY_OF_YEAR, -1)
-    val endDateNew = this.time
-    add(Calendar.DAY_OF_YEAR, -6)
-    val startDateNew = this.time
-    JetWeek(startDateNew, endDateNew, monthOfWeek)
-  }
-}

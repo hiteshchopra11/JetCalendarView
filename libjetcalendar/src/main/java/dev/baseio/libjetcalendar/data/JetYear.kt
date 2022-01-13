@@ -2,27 +2,25 @@ package dev.baseio.libjetcalendar.data
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import java.time.LocalDate
+import java.time.Year
+import java.time.YearMonth
+import java.time.temporal.TemporalAdjusters
 import java.util.*
+import java.time.temporal.TemporalQueries.localDate
+
 
 @Parcelize
-class JetYear(private val startDate: Date, val endDate: Date) : Parcelable {
-  fun currentMonth(): Int {
-    return Calendar.getInstance().run {
-      time = startDate
-      get(Calendar.MONTH)
-    }
+class JetYear(val startDate: LocalDate, val endDate: LocalDate) : Parcelable {
+  fun currentMonthPosition(): Int {
+    return YearMonth.now().monthValue - 1
   }
 
   companion object {
-    fun current(date: Date = Date()): JetYear {
-      return Calendar.getInstance().run {
-        time = date
-        set(Calendar.DAY_OF_YEAR, 1)
-        val startDate = this.time
-        set(Calendar.DAY_OF_YEAR, getActualMaximum(Calendar.DAY_OF_YEAR))
-        val endDate = this.time
-        JetYear(startDate, endDate)
-      }
+    fun current(date: LocalDate = LocalDate.now()): JetYear {
+      val day: LocalDate = date.with(TemporalAdjusters.firstDayOfYear())
+      val last: LocalDate = date.with(TemporalAdjusters.lastDayOfYear())
+      return JetYear(day, last)
     }
   }
 }
@@ -30,25 +28,19 @@ class JetYear(private val startDate: Date, val endDate: Date) : Parcelable {
 fun JetYear.months(): List<JetMonth> {
   val months = mutableListOf<JetMonth>()
 
-  Calendar.getInstance().run {
-    this[Calendar.DAY_OF_YEAR] = 1
-    var startDateMonth = this.time
-    val totalDaysInThisMonth = getActualMaximum(Calendar.DAY_OF_MONTH)
-    this[Calendar.DAY_OF_MONTH] = totalDaysInThisMonth
-    var endDateMonth = this.time
-    var currentYear = get(Calendar.YEAR)
-    while (true) {
-      months.add(JetMonth(startDateMonth, endDateMonth))
-      add(Calendar.DAY_OF_YEAR, 1)
-      if (get(Calendar.YEAR) > currentYear) {
-        break
-      }
-      startDateMonth = this.time
-      val newDays = getActualMaximum(Calendar.DAY_OF_MONTH)
-      this[Calendar.DAY_OF_MONTH] = newDays
-      endDateMonth = this.time
-      currentYear = get(Calendar.YEAR)
+  var startDateMonth = this.startDate.withDayOfMonth(1)
+  var endDateMonth = this.startDate.withDayOfMonth(this.startDate.lengthOfMonth())
+
+  var currentYear = this.startDate.year
+  while (true) {
+    months.add(JetMonth(startDateMonth, endDateMonth))
+
+    startDateMonth = endDateMonth.plusDays(1)
+    endDateMonth = startDateMonth.withDayOfMonth(startDateMonth.lengthOfMonth())
+    if (endDateMonth.year > currentYear) {
+      break
     }
+    currentYear = endDateMonth.year
   }
   return months
 }

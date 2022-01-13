@@ -2,48 +2,33 @@ package dev.baseio.libjetcalendar.data
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
-import java.text.DateFormatSymbols
+import java.time.LocalDate
+import java.time.YearMonth
+import java.time.format.TextStyle
+import java.time.temporal.TemporalAdjusters
+import java.time.temporal.WeekFields
 import java.util.*
 
 
 @Parcelize
-class JetMonth(val startDate: Date, val endDate: Date) : Parcelable {
+class JetMonth(val startDate: LocalDate, val endDate: LocalDate) : Parcelable {
   fun name(): String {
-    return Calendar.getInstance().run {
-      time = startDate
-      "${DateFormatSymbols().months[get(Calendar.MONTH)]} ${get(Calendar.YEAR)}"
-    }
+    return startDate.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
   }
 
 
   companion object {
-    fun current(date: Date = Date()): JetMonth {
-      return Calendar.getInstance().run {
-        time = date
-        this[Calendar.DAY_OF_MONTH] = getActualMinimum(Calendar.DAY_OF_MONTH)
-        this[Calendar.HOUR_OF_DAY] = 0
-        this[Calendar.MINUTE] = 0
-        this[Calendar.SECOND] = 0
-        val startDate = this.time
-
-        this.time = date
-        this[Calendar.DAY_OF_MONTH] = this.getActualMaximum(Calendar.DAY_OF_MONTH)
-        this[Calendar.HOUR_OF_DAY] = 23
-        this[Calendar.MINUTE] = 59
-        this[Calendar.SECOND] = 59
-        val endDate = this.time
-
-        JetMonth(startDate, endDate)
-      }
+    fun current(date: LocalDate = LocalDate.now()): JetMonth {
+      val startOfMonth = date.with(TemporalAdjusters.firstDayOfMonth())
+      val endOfMonth = date.with(TemporalAdjusters.lastDayOfMonth())
+      return JetMonth(startOfMonth, endOfMonth)
     }
   }
 }
 
 fun JetMonth.weeks(): List<JetWeek> {
-  val weeks = Calendar.getInstance().run {
-    time = this@weeks.startDate
-    getActualMaximum(Calendar.WEEK_OF_MONTH)
-  }
+  val currentYearMonth: YearMonth = YearMonth.of(this.endDate.year, this.endDate.monthValue)
+  val weeks = currentYearMonth.atEndOfMonth()[WeekFields.SUNDAY_START.weekOfMonth()]
   val monthWeeks = mutableListOf<JetWeek>()
   monthWeeks.add(JetWeek.current(this@weeks.startDate))
   while (monthWeeks.size != weeks) {
@@ -52,15 +37,3 @@ fun JetMonth.weeks(): List<JetWeek> {
   return monthWeeks
 }
 
-fun JetMonth.nextMonth(): JetMonth {
-  val currentMonth = this
-  return Calendar.getInstance().run {
-    time = currentMonth.endDate
-    add(Calendar.DAY_OF_YEAR, 1)
-    val startDateNew = this.time
-    val days = getActualMaximum(Calendar.DAY_OF_MONTH)
-    set(Calendar.DAY_OF_MONTH, days)
-    val endDateNew = this.time
-    JetMonth(startDateNew, endDateNew)
-  }
-}

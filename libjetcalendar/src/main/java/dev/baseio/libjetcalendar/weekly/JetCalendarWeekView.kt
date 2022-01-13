@@ -35,7 +35,7 @@ fun JetCalendarWeekView(
           .size(48.dp)
           .clip(CircleShape)
           .clickable {
-            if(date.isPartOfMonth){
+            if (date.isPartOfMonth) {
               onDateSelected(date)
             }
           }
@@ -43,7 +43,7 @@ fun JetCalendarWeekView(
         contentAlignment = Alignment.Center
       ) {
         Text(
-          text = date.day.toString(),
+          text = date.date.dayOfMonth.toString(),
           modifier = Modifier.padding(4.dp),
           style = TextStyle(
             fontSize = 18.sp,
