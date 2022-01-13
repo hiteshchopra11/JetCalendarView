@@ -29,7 +29,7 @@ fun JetYear.months(): List<JetMonth> {
     var endDateMonth = this.time
     var currentYear = get(Calendar.YEAR)
     while (true) {
-      months.add(JetMonth(startDateMonth, endDateMonth, startDateMonth))
+      months.add(JetMonth(startDateMonth, endDateMonth))
       add(Calendar.DAY_OF_YEAR, 1)
       if (get(Calendar.YEAR) > currentYear) {
         break

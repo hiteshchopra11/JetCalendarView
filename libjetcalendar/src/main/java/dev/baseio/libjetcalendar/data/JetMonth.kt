@@ -4,7 +4,7 @@ import java.text.DateFormatSymbols
 import java.util.*
 
 
-class JetMonth(val startDate: Date, val endDate: Date, val focusedDate: Date) {
+class JetMonth(val startDate: Date, val endDate: Date) {
   fun name(): String {
     return Calendar.getInstance().run {
       time = startDate
@@ -30,7 +30,7 @@ class JetMonth(val startDate: Date, val endDate: Date, val focusedDate: Date) {
         this[Calendar.SECOND] = 59
         val endDate = this.time
 
-        JetMonth(startDate, endDate, focusedDate = date)
+        JetMonth(startDate, endDate)
       }
     }
   }
@@ -58,6 +58,6 @@ fun JetMonth.nextMonth(): JetMonth {
     val days = getActualMaximum(Calendar.DAY_OF_MONTH)
     set(Calendar.DAY_OF_MONTH, days)
     val endDateNew = this.time
-    JetMonth(startDateNew, endDateNew, startDateNew)
+    JetMonth(startDateNew, endDateNew)
   }
 }
