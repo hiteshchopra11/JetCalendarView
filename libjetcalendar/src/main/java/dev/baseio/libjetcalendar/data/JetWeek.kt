@@ -1,4 +1,4 @@
-package dev.baseio.libjetcalendar
+package dev.baseio.libjetcalendar.data
 
 import java.util.*
 

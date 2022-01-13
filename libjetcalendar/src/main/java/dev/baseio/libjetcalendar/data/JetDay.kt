@@ -1,3 +1,3 @@
-package dev.baseio.libjetcalendar
+package dev.baseio.libjetcalendar.data
 
 data class JetDay(val year: Int, val month: Int, val day: Int)

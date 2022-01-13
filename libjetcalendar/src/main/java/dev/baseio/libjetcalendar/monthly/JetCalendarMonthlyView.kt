@@ -5,9 +5,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import dev.baseio.libjetcalendar.JetMonth
+import dev.baseio.libjetcalendar.data.JetMonth
 import dev.baseio.libjetcalendar.weekly.JetCalendarWeekView
-import dev.baseio.libjetcalendar.weeks
+import dev.baseio.libjetcalendar.data.weeks
 
 @Composable
 fun JetCalendarMonthlyView(jetMonth: JetMonth = JetMonth.current()) {

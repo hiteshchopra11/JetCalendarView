@@ -2,6 +2,7 @@ package dev.baseio.libjetcalendar
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import dev.baseio.libjetcalendar.data.JetViewType
 import java.time.DayOfWeek
 import java.util.*
 
