@@ -4,7 +4,7 @@ WIP
 
 2022 Hit Refresh! Calendar view ❤️ Jetpack Compose
 
-<img src="art/art1.png" />
+<img src="art/art1.gif" />
 
 
 License
