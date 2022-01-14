@@ -45,7 +45,7 @@ fun CalendarExample() {
     Scaffold(topBar = {
       TopAppBar(title = {
         Column(){
-          Text("Calendar Example")
+          Text("JetCalendar")
           Text(viewTypeFlow.toString(), style = TextStyle(fontSize = 12.sp))
         }
       }, actions = {
