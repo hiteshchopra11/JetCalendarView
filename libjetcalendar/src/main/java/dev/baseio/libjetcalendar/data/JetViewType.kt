@@ -4,5 +4,12 @@ enum class JetViewType {
   MONTHLY,
   WEEKLY,
   BI_WEEKLY,
-  YEARLY
+  YEARLY;
+
+  fun next(): JetViewType {
+    if (ordinal == 4) {
+      return MONTHLY
+    }
+    return values()[ordinal + 1]
+  }
 }

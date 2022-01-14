@@ -7,6 +7,7 @@ import dev.baseio.libjetcalendar.data.JetDay
 import dev.baseio.libjetcalendar.weekly.JetCalendarWeekView
 import dev.baseio.libjetcalendar.data.JetWeek
 import dev.baseio.libjetcalendar.data.nextWeek
+import dev.baseio.libjetcalendar.monthly.WeekNames
 import java.time.LocalDate
 
 @Composable
@@ -17,6 +18,7 @@ fun JetCalendarBiWeeklyView(
 ) {
   Column {
     val nextWeek = weekOne.nextWeek(false)
+    WeekNames(weekOne)
     JetCalendarWeekView(
       modifier = Modifier,
       week = weekOne,
