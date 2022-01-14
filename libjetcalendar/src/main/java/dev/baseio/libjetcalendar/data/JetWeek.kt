@@ -13,25 +13,40 @@ data class JetWeek(
   val startDate: LocalDate,
   val endDate: LocalDate,
   val monthOfWeek: Int,
+  val dayOfWeek: DayOfWeek,
+  val isFirstWeek: Boolean,
 ) : Parcelable {
+  fun dayNames(): List<String> {
+    val days = mutableListOf<DayOfWeek>()
+    days.add(dayOfWeek)
+    while (days.size != 7) {
+      days.add(days.last().plus(1))
+    }
+    return days.map { it.getDisplayName(java.time.format.TextStyle.SHORT, Locale.getDefault()) }
+  }
+
   companion object {
-    fun current(date: LocalDate = LocalDate.now()): JetWeek {
-      val firstDayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek
-      val startOfCurrentWeek: LocalDate = date.with(TemporalAdjusters.previousOrSame(firstDayOfWeek))
-      val lastDayOfWeek = firstDayOfWeek.plus(6) // or minus(1)
+    fun current(
+      date: LocalDate = LocalDate.now(),
+      dayOfWeek: DayOfWeek,
+      isFirstWeek: Boolean
+    ): JetWeek {
+      val startOfCurrentWeek: LocalDate =
+        date.with(TemporalAdjusters.previousOrSame(dayOfWeek))
+      val lastDayOfWeek = dayOfWeek.plus(6) // or minus(1)
       val endOfWeek: LocalDate = date.with(TemporalAdjusters.nextOrSame(lastDayOfWeek))
-      return JetWeek(startOfCurrentWeek, endOfWeek, date.monthValue)
+      return JetWeek(startOfCurrentWeek, endOfWeek, date.monthValue, dayOfWeek, isFirstWeek)
     }
   }
 }
 
 fun JetWeek.dates(): List<JetDay> {
-  val weekDates = mutableListOf<JetDay>()
-  weekDates.add(startDate.toJetDay(this))
-  while (weekDates.size != 7) {
-    weekDates.add(weekDates.last().nextDay(this))
+  val days = mutableListOf<JetDay>()
+  days.add(startDate.toJetDay(this))
+  while (days.size != 7) {
+    days.add(days.last().nextDay(this))
   }
-  return weekDates
+  return days
 }
 
 fun LocalDate.toJetDay(jetWeek: JetWeek): JetDay {
@@ -39,10 +54,20 @@ fun LocalDate.toJetDay(jetWeek: JetWeek): JetDay {
 }
 
 private fun JetDay.nextDay(jetWeek: JetWeek): JetDay {
-  return JetDay(this.date.plusDays(1), this.date.plusDays(1).monthValue == jetWeek.monthOfWeek)
+  val date = this.date.plusDays(1)
+  val isPartOfMonth = this.date.plusDays(1).monthValue == jetWeek.monthOfWeek
+  return JetDay(date, isPartOfMonth)
 }
 
-fun JetWeek.nextWeek(): JetWeek {
-  return JetWeek(this.endDate.plusDays(1), this.endDate.plusDays(7), monthOfWeek = monthOfWeek)
+fun JetWeek.nextWeek(isFirstWeek: Boolean): JetWeek {
+  val firstDay = this.endDate.plusDays(1)
+  val lastDay = this.endDate.plusDays(7)
+  return JetWeek(
+    firstDay,
+    lastDay,
+    monthOfWeek = monthOfWeek,
+    dayOfWeek = dayOfWeek,
+    isFirstWeek = isFirstWeek
+  )
 }
 

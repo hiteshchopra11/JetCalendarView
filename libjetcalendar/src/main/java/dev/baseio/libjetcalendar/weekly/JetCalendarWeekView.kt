@@ -16,19 +16,22 @@ import androidx.compose.ui.unit.sp
 import dev.baseio.libjetcalendar.data.JetDay
 import dev.baseio.libjetcalendar.data.JetWeek
 import dev.baseio.libjetcalendar.data.dates
+import java.time.DayOfWeek
 
 @Composable
 fun JetCalendarWeekView(
   modifier: Modifier,
-  week: JetWeek = JetWeek.current(),
+  week: JetWeek,
   onDateSelected: (JetDay) -> Unit,
-  selectedDates: Set<JetDay>
+  selectedDates: Set<JetDay>,
 ) {
+
   Row(
     modifier = modifier.fillMaxWidth(),
     verticalAlignment = Alignment.CenterVertically,
     horizontalArrangement = Arrangement.Center
   ) {
+
     week.dates().forEach { date ->
       Box(
         modifier = Modifier

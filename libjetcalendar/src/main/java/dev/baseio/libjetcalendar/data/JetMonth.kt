@@ -2,6 +2,7 @@ package dev.baseio.libjetcalendar.data
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle
@@ -26,13 +27,13 @@ class JetMonth(val startDate: LocalDate, val endDate: LocalDate) : Parcelable {
   }
 }
 
-fun JetMonth.weeks(): List<JetWeek> {
+fun JetMonth.weeks(firstDayOfWeek: DayOfWeek): List<JetWeek> {
   val currentYearMonth: YearMonth = YearMonth.of(this.endDate.year, this.endDate.monthValue)
   val weeks = currentYearMonth.atEndOfMonth()[WeekFields.SUNDAY_START.weekOfMonth()]
   val monthWeeks = mutableListOf<JetWeek>()
-  monthWeeks.add(JetWeek.current(this@weeks.startDate))
+  monthWeeks.add(JetWeek.current(this@weeks.startDate,isFirstWeek = true, dayOfWeek = firstDayOfWeek))
   while (monthWeeks.size != weeks) {
-    monthWeeks.add(monthWeeks.last().nextWeek())
+    monthWeeks.add(monthWeeks.last().nextWeek(isFirstWeek = false))
   }
   return monthWeeks
 }

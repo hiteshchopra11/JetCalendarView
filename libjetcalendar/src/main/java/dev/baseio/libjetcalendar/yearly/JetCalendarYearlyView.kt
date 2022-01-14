@@ -11,12 +11,14 @@ import dev.baseio.libjetcalendar.data.JetMonth
 import dev.baseio.libjetcalendar.data.JetYear
 import dev.baseio.libjetcalendar.data.months
 import dev.baseio.libjetcalendar.monthly.JetCalendarMonthlyView
+import java.time.DayOfWeek
 
 @Composable
 fun JetCalendarYearlyView(
   startingYear: JetYear = JetYear.current(),
   onDateSelected: (JetDay) -> Unit,
   selectedDates: Set<JetDay>,
+  firstDayOfWeek: DayOfWeek,
 ) {
 
   val state by rememberSaveable(stateSaver = monthsListSaver()) {
@@ -31,7 +33,7 @@ fun JetCalendarYearlyView(
 
   LazyColumn(state = listState) {
     items(state) { month ->
-      JetCalendarMonthlyView(month, onDateSelected, selectedDates)
+      JetCalendarMonthlyView(month, onDateSelected, selectedDates, firstDayOfWeek)
     }
   }
 
