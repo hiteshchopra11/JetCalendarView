@@ -1,6 +1,8 @@
 # JetCalendar 
 
-WIP
+This project is a wip. Please raise issues if you find any, thanks!
+🚧 To implement pagination for year view
+🚧 customize and allow for styling
 
 2022 Hit Refresh! Calendar view ❤️ Jetpack Compose
 
