@@ -1,16 +1,26 @@
 package dev.baseio.libjetcalendar.yearly
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
-import dev.baseio.libjetcalendar.data.JetDay
-import dev.baseio.libjetcalendar.data.JetMonth
-import dev.baseio.libjetcalendar.data.JetYear
-import dev.baseio.libjetcalendar.data.months
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
+import androidx.paging.*
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
+import dev.baseio.libjetcalendar.data.*
 import dev.baseio.libjetcalendar.monthly.JetCalendarMonthlyView
+import kotlinx.coroutines.flow.Flow
 import java.time.DayOfWeek
 
 @Composable
@@ -19,11 +29,10 @@ fun JetCalendarYearlyView(
   onDateSelected: (JetDay) -> Unit,
   selectedDates: Set<JetDay>,
   firstDayOfWeek: DayOfWeek,
+  monthsFlow: Flow<PagingData<JetMonth>>
 ) {
+  val lazyPagingMonths = monthsFlow.collectAsLazyPagingItems()
 
-  val state by rememberSaveable(stateSaver = monthsListSaver()) {
-    mutableStateOf(startingYear.months())
-  }
   val lazyListState = LazyListState(
     startingYear.currentMonthPosition(),
   )
@@ -31,20 +40,62 @@ fun JetCalendarYearlyView(
     lazyListState
   }
 
-  LazyColumn(state = listState) {
-    items(state) { month ->
-      JetCalendarMonthlyView(month, onDateSelected, selectedDates, firstDayOfWeek)
-    }
-  }
-
+  YearViewInternal(listState, lazyPagingMonths, onDateSelected, selectedDates, firstDayOfWeek)
 }
 
 @Composable
-private fun monthsListSaver() = listSaver<List<JetMonth>, Any>(save = {
-  it
-}, restore = {
-  it.map { month -> month as JetMonth }
-})
+private fun YearViewInternal(
+  listState: LazyListState,
+  pagedMonths: LazyPagingItems<JetMonth>,
+  onDateSelected: (JetDay) -> Unit,
+  selectedDates: Set<JetDay>,
+  firstDayOfWeek: DayOfWeek
+) {
+  LazyColumn(
+    state = listState
+  ) {
+    items(pagedMonths) { month ->
+      JetCalendarMonthlyView(month!!, onDateSelected, selectedDates, firstDayOfWeek)
+    }
+    loadingStates(pagedMonths)
+  }
+}
+
+private fun LazyListScope.loadingStates(pagedMonths: LazyPagingItems<JetMonth>) {
+  pagedMonths.apply {
+    when {
+      loadState.refresh is
+          LoadState.Loading -> {
+        item { LoadingItem() }
+      }
+      loadState.append is
+          LoadState.Loading -> {
+        item { LoadingItem() }
+      }
+      loadState.refresh is
+          LoadState.Error -> {
+      }
+      loadState.append is
+          LoadState.Error -> {
+      }
+    }
+  }
+}
+
+
+@Composable
+fun LoadingItem() {
+  CircularProgressIndicator(
+    modifier =
+    Modifier
+      .testTag("ProgressBarItem")
+      .fillMaxWidth()
+      .padding(16.dp)
+      .wrapContentWidth(
+        Alignment.CenterHorizontally
+      )
+  )
+}
 
 @Composable
 private fun lazyListStateSaver(lazyListState: LazyListState) =

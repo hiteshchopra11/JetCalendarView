@@ -15,7 +15,7 @@ data class JetWeek(
   val monthOfWeek: Int,
   val dayOfWeek: DayOfWeek,
   val isFirstWeek: Boolean,
-) : Parcelable {
+) : Parcelable, JetCalendarType() {
   fun dayNames(): List<String> {
     val days = mutableListOf<DayOfWeek>()
     days.add(dayOfWeek)

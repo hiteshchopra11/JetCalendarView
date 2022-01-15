@@ -35,25 +35,41 @@ fun JetCalendarWeekView(
     week.dates().forEach { date ->
       Box(
         modifier = Modifier
-          .size(48.dp)
+          .size(50.dp)
+          .padding(2.dp)
           .clip(CircleShape)
           .clickable {
             if (date.isPartOfMonth) {
               onDateSelected(date)
             }
           }
-          .background(if (selectedDates.contains(date)) Color.Yellow else Color.White),
+          .background(bgColor(selectedDates, date)),
         contentAlignment = Alignment.Center
       ) {
         Text(
           text = date.date.dayOfMonth.toString(),
           modifier = Modifier.padding(4.dp),
           style = TextStyle(
-            fontSize = 18.sp,
-            color = if (date.isPartOfMonth) Color.Black else Color.LightGray
+            color = textColor(selectedDates, date)
           )
         )
       }
     }
   }
 }
+
+@Composable
+private fun textColor(selectedDates: Set<JetDay>, date: JetDay): Color {
+  if (selectedDates.contains(date)) {
+    return Color.White
+  }
+  return if (date.isPartOfMonth) {
+    Color.Black
+  } else Color.LightGray
+}
+
+@Composable
+private fun bgColor(
+  selectedDates: Set<JetDay>,
+  date: JetDay
+) = if (selectedDates.contains(date)) Color.Black else Color.White

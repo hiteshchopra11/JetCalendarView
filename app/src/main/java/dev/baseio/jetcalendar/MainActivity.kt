@@ -39,12 +39,12 @@ class MainActivity : ComponentActivity() {
 fun CalendarExample() {
   var stateFlow by rememberSaveable { mutableStateOf(setOf<JetDay>()) }
   var viewTypeFlow by remember {
-    mutableStateOf(JetViewType.MONTHLY)
+    mutableStateOf(JetViewType.YEARLY)
   }
   Surface(color = MaterialTheme.colors.background) {
     Scaffold(topBar = {
       TopAppBar(title = {
-        Column(){
+        Column {
           Text("JetCalendar")
           Text(viewTypeFlow.toString(), style = TextStyle(fontSize = 12.sp))
         }
@@ -56,7 +56,7 @@ fun CalendarExample() {
             Icon(
               Icons.Filled.Clear,
               "clear selection",
-              tint = Color.White
+              tint = Color.Black
             )
           })
         IconButton(modifier = Modifier.then(Modifier.padding(8.dp)),
@@ -66,7 +66,7 @@ fun CalendarExample() {
             Icon(
               Icons.Filled.List,
               "switch view type",
-              tint = Color.White
+              tint = Color.Black
             )
           })
       })

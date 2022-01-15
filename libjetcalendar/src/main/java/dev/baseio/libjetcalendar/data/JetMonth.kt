@@ -12,9 +12,14 @@ import java.util.*
 
 
 @Parcelize
-class JetMonth(val startDate: LocalDate, val endDate: LocalDate) : Parcelable {
+class JetMonth(val startDate: LocalDate, val endDate: LocalDate) : Parcelable, JetCalendarType() {
   fun name(): String {
-    return startDate.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
+    return "${
+      startDate.month.getDisplayName(
+        TextStyle.FULL,
+        Locale.getDefault()
+      )
+    } ${startDate.year}"
   }
 
 
@@ -29,9 +34,15 @@ class JetMonth(val startDate: LocalDate, val endDate: LocalDate) : Parcelable {
 
 fun JetMonth.weeks(firstDayOfWeek: DayOfWeek): List<JetWeek> {
   val currentYearMonth: YearMonth = YearMonth.of(this.endDate.year, this.endDate.monthValue)
-  val weeks = currentYearMonth.atEndOfMonth()[WeekFields.SUNDAY_START.weekOfMonth()]
+  val weeks = currentYearMonth.atEndOfMonth().get(WeekFields.of(firstDayOfWeek, 1).weekOfMonth())
   val monthWeeks = mutableListOf<JetWeek>()
-  monthWeeks.add(JetWeek.current(this@weeks.startDate,isFirstWeek = true, dayOfWeek = firstDayOfWeek))
+  monthWeeks.add(
+    JetWeek.current(
+      this@weeks.startDate,
+      isFirstWeek = true,
+      dayOfWeek = firstDayOfWeek
+    )
+  )
   while (monthWeeks.size != weeks) {
     monthWeeks.add(monthWeeks.last().nextWeek(isFirstWeek = false))
   }

@@ -11,7 +11,7 @@ import java.time.temporal.TemporalQueries.localDate
 
 
 @Parcelize
-class JetYear(val startDate: LocalDate, val endDate: LocalDate) : Parcelable {
+class JetYear(val startDate: LocalDate, val endDate: LocalDate) : Parcelable, JetCalendarType() {
   fun currentMonthPosition(): Int {
     return YearMonth.now().monthValue - 1
   }
