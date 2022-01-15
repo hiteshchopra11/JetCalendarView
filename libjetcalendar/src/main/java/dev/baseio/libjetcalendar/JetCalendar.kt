@@ -51,15 +51,15 @@ fun JetCalendar(
     )
     JetViewType.YEARLY -> {
       val year = JetYear.current(today)
-      val monthsFlow = Pager(PagingConfig(12, initialLoadSize = 12)) {
+      val pager = Pager(PagingConfig(12, initialLoadSize = 12)) {
         JetPagingSource(year.startDate)
-      }.flow
+      }
 
       JetCalendarYearlyView(
         startingYear = year,
         onDateSelected, selectedDates,
         firstDayOfWeek = firstDayOfWeek,
-        monthsFlow = monthsFlow
+        monthsPager = pager
       )
     }
   }

@@ -1,5 +1,6 @@
 package dev.baseio.libjetcalendar.yearly
 
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -20,8 +21,8 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import dev.baseio.libjetcalendar.data.*
 import dev.baseio.libjetcalendar.monthly.JetCalendarMonthlyView
-import kotlinx.coroutines.flow.Flow
 import java.time.DayOfWeek
+import java.time.LocalDate
 
 @Composable
 fun JetCalendarYearlyView(
@@ -29,9 +30,9 @@ fun JetCalendarYearlyView(
   onDateSelected: (JetDay) -> Unit,
   selectedDates: Set<JetDay>,
   firstDayOfWeek: DayOfWeek,
-  monthsFlow: Flow<PagingData<JetMonth>>
+  monthsPager: Pager<LocalDate,JetMonth>
 ) {
-  val lazyPagingMonths = monthsFlow.collectAsLazyPagingItems()
+  val lazyPagingMonths = monthsPager.flow.collectAsLazyPagingItems()
 
   val lazyListState = LazyListState(
     startingYear.currentMonthPosition(),
@@ -52,7 +53,8 @@ private fun YearViewInternal(
   firstDayOfWeek: DayOfWeek
 ) {
   LazyColumn(
-    state = listState
+    state = listState,
+    modifier = Modifier.fillMaxWidth().fillMaxHeight()
   ) {
     items(pagedMonths) { month ->
       JetCalendarMonthlyView(month!!, onDateSelected, selectedDates, firstDayOfWeek)

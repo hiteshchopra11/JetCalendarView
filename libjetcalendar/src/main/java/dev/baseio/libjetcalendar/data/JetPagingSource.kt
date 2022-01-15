@@ -17,8 +17,7 @@ class JetPagingSource(private val initialDate:LocalDate) : PagingSource<LocalDat
 
   override fun getRefreshKey(state: PagingState<LocalDate, JetMonth>): LocalDate? {
     return state.anchorPosition?.let { anchorPosition ->
-      val anchorPage = state.closestPageToPosition(anchorPosition)
-      anchorPage?.prevKey?.plusYears(1) ?: anchorPage?.nextKey?.minusYears(1)
+      state.closestItemToPosition(anchorPosition)?.startDate
     }
   }
 }
