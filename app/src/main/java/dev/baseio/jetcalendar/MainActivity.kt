@@ -51,16 +51,6 @@ fun CalendarExample() {
       }, actions = {
         IconButton(modifier = Modifier.then(Modifier.padding(8.dp)),
           onClick = {
-            selectionState = hashSetOf()
-          }, content = {
-            Icon(
-              Icons.Filled.Clear,
-              "clear selection",
-              tint = Color.Black
-            )
-          })
-        IconButton(modifier = Modifier.then(Modifier.padding(8.dp)),
-          onClick = {
             viewTypeFlow = viewTypeFlow.next()
           }, content = {
             Icon(
@@ -74,7 +64,11 @@ fun CalendarExample() {
       JetCalendar(modifier = Modifier, viewType = viewTypeFlow, onDateSelected = { jetDay ->
         selectionState = hashSetOf<JetDay>().apply {
           addAll(selectionState)
-          add(jetDay)
+          if(contains(jetDay)){
+            remove(jetDay)
+          }else{
+            add(jetDay)
+          }
         }
       }, selectedDates = selectionState)
     }

@@ -42,7 +42,11 @@ fun JetCalendarWeekView(
               onDateSelected(date)
               selectedDatesLocal = hashSetOf<JetDay>().apply {
                 addAll(selectedDatesLocal)
-                add(date)
+                if (contains(date)) {
+                  remove(date)
+                } else {
+                  add(date)
+                }
               }
 
             }
