@@ -7,17 +7,13 @@ import kotlinx.coroutines.withContext
 import java.time.DayOfWeek
 import java.time.LocalDate
 
-class JetPagingSource(private val initialYear: LocalDate, private val firstDayOfWeek: DayOfWeek) : PagingSource<LocalDate, JetYear>() {
+class JetPagingSource(private val initialYear: LocalDate, private val firstDayOfWeek: DayOfWeek) : PagingSource<LocalDate, JetMonth>() {
 
-  override suspend fun load(params: LoadParams<LocalDate>): LoadResult<LocalDate, JetYear> {
+  override suspend fun load(params: LoadParams<LocalDate>): LoadResult<LocalDate, JetMonth> {
     val initial = params.key ?: initialYear
     val years = withContext(Dispatchers.Default) {
-      mutableListOf<JetYear>().apply {
-        add(JetYear.current(initial,firstDayOfWeek))
-        while (this.size != params.loadSize) {
-          add(JetYear.current(this.last().endDate.plusDays(1), firstDayOfWeek))
-        }
-      }
+      val current = JetYear.current(initial,firstDayOfWeek)
+      current.yearMonths!!
     }
     return LoadResult.Page(
       data = years,
@@ -26,7 +22,7 @@ class JetPagingSource(private val initialYear: LocalDate, private val firstDayOf
     )
   }
 
-  override fun getRefreshKey(state: PagingState<LocalDate, JetYear>): LocalDate? {
+  override fun getRefreshKey(state: PagingState<LocalDate, JetMonth>): LocalDate? {
     return state.anchorPosition?.let { anchorPosition ->
       state.closestItemToPosition(anchorPosition)?.startDate
     }

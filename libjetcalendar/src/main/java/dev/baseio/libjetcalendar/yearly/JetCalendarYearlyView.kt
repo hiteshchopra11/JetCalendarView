@@ -42,7 +42,7 @@ fun JetCalendarYearlyView(
 @Composable
 private fun YearViewInternal(
   listState: LazyListState,
-  pagedMonths: LazyPagingItems<JetYear>,
+  pagedMonths: LazyPagingItems<JetMonth>,
   onDateSelected: (JetDay) -> Unit,
   selectedDates: Set<JetDay>
 ) {
@@ -67,19 +67,15 @@ private fun YearViewInternal(
 }
 
 private fun LazyListScope.calendarMonths(
-  pagedYears: LazyPagingItems<JetYear>,
+  pagedYears: LazyPagingItems<JetMonth>,
   onDateSelected: (JetDay) -> Unit,
   selectedDates: Set<JetDay>,
 ) {
-  items(pagedYears) { year ->
+  items(pagedYears) { month ->
     Box(
       modifier = Modifier.fillParentMaxWidth()
     ) {
-      Column {
-        year?.yearMonths?.forEach { month ->
-          JetCalendarMonthlyView(month, onDateSelected, selectedDates)
-        }
-      }
+      JetCalendarMonthlyView(month!!, onDateSelected, selectedDates)
     }
   }
 }
