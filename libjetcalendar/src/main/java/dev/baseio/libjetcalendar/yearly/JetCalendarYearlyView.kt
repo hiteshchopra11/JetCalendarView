@@ -5,34 +5,40 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
-import androidx.paging.*
-import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.items
 import dev.baseio.libjetcalendar.data.*
 import dev.baseio.libjetcalendar.monthly.JetCalendarMonthlyView
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
 import java.time.DayOfWeek
-import java.time.LocalDate
+
 
 @Composable
 fun JetCalendarYearlyView(
   startingYear: JetYear = JetYear.current(),
   onDateSelected: (JetDay) -> Unit,
+  onNextMonthsRequested: (JetMonth?) -> Unit,
   selectedDates: Set<JetDay>,
   firstDayOfWeek: DayOfWeek,
-  monthsPager: Pager<LocalDate,JetMonth>
+  months: List<JetMonth>
 ) {
-  val lazyPagingMonths = monthsPager.flow.collectAsLazyPagingItems()
+  val state by rememberSaveable(stateSaver = monthsListSaver()) {
+    mutableStateOf(months)
+  }
 
   val lazyListState = LazyListState(
     startingYear.currentMonthPosition(),
@@ -41,45 +47,57 @@ fun JetCalendarYearlyView(
     lazyListState
   }
 
-  YearViewInternal(listState, lazyPagingMonths, onDateSelected, selectedDates, firstDayOfWeek)
+  YearViewInternal(
+    listState,
+    state,
+    onDateSelected,
+    selectedDates,
+    firstDayOfWeek,
+    onNextMonthsRequested
+  )
 }
+
+@Composable
+private fun monthsListSaver() = listSaver<List<JetMonth>, Any>(save = {
+  it
+}, restore = {
+  it.map { month -> month as JetMonth }
+})
+
 
 @Composable
 private fun YearViewInternal(
   listState: LazyListState,
-  pagedMonths: LazyPagingItems<JetMonth>,
+  pagedMonths: List<JetMonth>,
   onDateSelected: (JetDay) -> Unit,
   selectedDates: Set<JetDay>,
-  firstDayOfWeek: DayOfWeek
+  firstDayOfWeek: DayOfWeek,
+  onNextMonthsRequested: (JetMonth?) -> Unit
 ) {
+
+  val loadMore = remember {
+    derivedStateOf {
+      val layoutInfo = listState.layoutInfo
+      val totalItemsNumber = layoutInfo.totalItemsCount
+      val lastVisibleItemIndex = (layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0) + 1
+
+      lastVisibleItemIndex > (totalItemsNumber -  2)
+    }
+  }
+
+  LaunchedEffect(loadMore) {
+    snapshotFlow { loadMore.value }
+      .distinctUntilChanged().collect {
+        onNextMonthsRequested(pagedMonths.lastOrNull())
+      }
+  }
+
   LazyColumn(
     state = listState,
-    modifier = Modifier.fillMaxWidth().fillMaxHeight()
+    modifier = Modifier
   ) {
     items(pagedMonths) { month ->
-      JetCalendarMonthlyView(month!!, onDateSelected, selectedDates, firstDayOfWeek)
-    }
-    loadingStates(pagedMonths)
-  }
-}
-
-private fun LazyListScope.loadingStates(pagedMonths: LazyPagingItems<JetMonth>) {
-  pagedMonths.apply {
-    when {
-      loadState.refresh is
-          LoadState.Loading -> {
-        item { LoadingItem() }
-      }
-      loadState.append is
-          LoadState.Loading -> {
-        item { LoadingItem() }
-      }
-      loadState.refresh is
-          LoadState.Error -> {
-      }
-      loadState.append is
-          LoadState.Error -> {
-      }
+      JetCalendarMonthlyView(month, onDateSelected, selectedDates, firstDayOfWeek)
     }
   }
 }

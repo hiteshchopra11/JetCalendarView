@@ -1,16 +1,16 @@
 package dev.baseio.libjetcalendar
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import dev.baseio.libjetcalendar.biweekly.JetCalendarBiWeeklyView
 import dev.baseio.libjetcalendar.data.*
 import dev.baseio.libjetcalendar.monthly.JetCalendarMonthlyView
 import dev.baseio.libjetcalendar.monthly.WeekNames
 import dev.baseio.libjetcalendar.weekly.JetCalendarWeekView
 import dev.baseio.libjetcalendar.yearly.JetCalendarYearlyView
+import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.WeekFields
@@ -51,16 +51,32 @@ fun JetCalendar(
     )
     JetViewType.YEARLY -> {
       val year = JetYear.current(today)
-      val pager = Pager(PagingConfig(12, initialLoadSize = 12)) {
-        JetPagingSource(year.startDate)
+      var stateFlow by rememberSaveable {
+        val months = year.months()
+        mutableStateOf(listOf<JetMonth>())
       }
 
       JetCalendarYearlyView(
         startingYear = year,
-        onDateSelected, selectedDates,
+        onDateSelected,
+        onNextMonthsRequested = {
+          if (it == null) {
+            stateFlow.addAll(year.months())
+          } else {
+            stateFlow.addAll(JetYear.current(it.endDate.plusDays(1)).months())
+          }
+        },
+        selectedDates,
         firstDayOfWeek = firstDayOfWeek,
-        monthsPager = pager
+        stateFlow
       )
+      LaunchedEffect(Unit) {
+        this.launch {
+          stateFlow = mutableListOf<JetMonth>().apply {
+            addAll(year.months())
+          }
+        }
+      }
     }
   }
 }
