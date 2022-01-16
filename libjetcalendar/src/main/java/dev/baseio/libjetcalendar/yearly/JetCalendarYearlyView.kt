@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -24,16 +25,16 @@ fun JetCalendarYearlyView(
   selectedDates: Set<JetDay>,
   firstDayOfWeek: DayOfWeek,
 ) {
-
   val monthsPager = Pager(PagingConfig(12)) {
     JetPagingSource(startingYear.startDate)
   }
   val lazyPagingMonths = monthsPager.flow.collectAsLazyPagingItems()
-
+  // affected by https://stackoverflow.com/questions/69739108/how-to-save-paging-state-of-lazycolumn-during-navigation-in-jetpack-compose
   val listState = rememberLazyListState(startingYear.currentMonthPosition())
 
   YearViewInternal(listState, lazyPagingMonths, onDateSelected, selectedDates, firstDayOfWeek)
 }
+
 
 @Composable
 private fun YearViewInternal(
@@ -43,16 +44,23 @@ private fun YearViewInternal(
   selectedDates: Set<JetDay>,
   firstDayOfWeek: DayOfWeek
 ) {
-  LazyColumn(
-    state = listState,
-    modifier = Modifier
-      .fillMaxWidth()
-      .fillMaxHeight()
-  ) {
-    items(pagedMonths) { month ->
-      JetCalendarMonthlyView(month!!, onDateSelected, selectedDates, firstDayOfWeek)
+  when (pagedMonths.itemCount) {
+    0 -> CircularProgressIndicator()
+    else -> {
+      LazyColumn(
+        state = listState,
+        modifier = Modifier
+          .fillMaxWidth()
+          .fillMaxHeight()
+      ) {
+
+        items(pagedMonths) { month ->
+          JetCalendarMonthlyView(month!!, onDateSelected, selectedDates, firstDayOfWeek)
+        }
+      }
     }
   }
+
 }
 
 

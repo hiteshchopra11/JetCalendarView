@@ -51,8 +51,6 @@ fun JetCalendar(
     )
     JetViewType.YEARLY -> {
       val year = JetYear.current(today)
-
-
       JetCalendarYearlyView(
         startingYear = year,
         onDateSelected, selectedDates,
