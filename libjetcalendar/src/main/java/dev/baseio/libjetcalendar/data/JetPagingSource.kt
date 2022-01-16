@@ -10,7 +10,7 @@ class JetPagingSource(private val initialDate:LocalDate) : PagingSource<LocalDat
     val initial = params.key ?: initialDate
     return LoadResult.Page(
       data = JetYear.current(initial).months(),
-      prevKey = initial.minusYears(1),
+      prevKey = null,
       nextKey = initial.plusYears(1)
     )
   }
