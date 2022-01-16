@@ -11,15 +11,16 @@ class JetPagingSource(private val initialYear: LocalDate, private val firstDayOf
 
   override suspend fun load(params: LoadParams<LocalDate>): LoadResult<LocalDate, JetYear> {
     val initial = params.key ?: initialYear
-    return LoadResult.Page(
-      data = withContext(Dispatchers.Default) {
-        mutableListOf<JetYear>().apply {
-          add(JetYear.current(initial,firstDayOfWeek))
-          while (this.size != params.loadSize) {
-            add(JetYear.current(this.last().endDate.plusDays(1), firstDayOfWeek))
-          }
+    val years = withContext(Dispatchers.Default) {
+      mutableListOf<JetYear>().apply {
+        add(JetYear.current(initial,firstDayOfWeek))
+        while (this.size != params.loadSize) {
+          add(JetYear.current(this.last().endDate.plusDays(1), firstDayOfWeek))
         }
-      },
+      }
+    }
+    return LoadResult.Page(
+      data = years,
       prevKey = null,
       nextKey = initial.plusYears(1)
     )

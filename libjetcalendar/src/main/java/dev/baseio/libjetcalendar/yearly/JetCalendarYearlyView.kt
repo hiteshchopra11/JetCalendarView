@@ -24,7 +24,7 @@ fun JetCalendarYearlyView(
   firstDayOfWeek: DayOfWeek,
 ) {
   val monthsPager = Pager(PagingConfig(12)) {
-    JetPagingSource(startingYear.startDate,firstDayOfWeek)
+    JetPagingSource(startingYear.startDate, firstDayOfWeek)
   }
   val lazyPagingMonths = monthsPager.flow.collectAsLazyPagingItems()
   // affected by https://stackoverflow.com/questions/69739108/how-to-save-paging-state-of-lazycolumn-during-navigation-in-jetpack-compose
@@ -34,8 +34,7 @@ fun JetCalendarYearlyView(
     listState,
     lazyPagingMonths,
     onDateSelected,
-    selectedDates,
-    firstDayOfWeek
+    selectedDates
   )
 }
 
@@ -45,8 +44,7 @@ private fun YearViewInternal(
   listState: LazyListState,
   pagedMonths: LazyPagingItems<JetYear>,
   onDateSelected: (JetDay) -> Unit,
-  selectedDates: Set<JetDay>,
-  firstDayOfWeek: DayOfWeek
+  selectedDates: Set<JetDay>
 ) {
   when (pagedMonths.itemCount) {
     0 -> CircularProgressIndicator(color = Color.Black, modifier = Modifier.padding(8.dp))
@@ -60,8 +58,7 @@ private fun YearViewInternal(
         calendarMonths(
           pagedMonths,
           onDateSelected,
-          selectedDates,
-          firstDayOfWeek
+          selectedDates
         )
       }
     }
@@ -73,7 +70,6 @@ private fun LazyListScope.calendarMonths(
   pagedYears: LazyPagingItems<JetYear>,
   onDateSelected: (JetDay) -> Unit,
   selectedDates: Set<JetDay>,
-  firstDayOfWeek: DayOfWeek,
 ) {
   items(pagedYears) { year ->
     Box(
