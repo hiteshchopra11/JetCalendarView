@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun CalendarExample() {
-  var selectionState by rememberSaveable { mutableStateOf(setOf<JetDay>()) }
+  var selectionState = mutableSetOf<JetDay>()
   var viewTypeFlow by remember {
     mutableStateOf(JetViewType.YEARLY)
   }
