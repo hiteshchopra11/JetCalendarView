@@ -1,27 +1,28 @@
 package dev.baseio.libjetcalendar.monthly
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import dev.baseio.libjetcalendar.data.JetDay
-import dev.baseio.libjetcalendar.data.JetMonth
-import dev.baseio.libjetcalendar.data.JetWeek
+import dev.baseio.libjetcalendar.data.*
 import dev.baseio.libjetcalendar.weekly.JetCalendarWeekView
-import dev.baseio.libjetcalendar.data.weeks
-import java.time.DayOfWeek
 
 @Composable
 fun JetCalendarMonthlyView(
-  jetMonth: JetMonth = JetMonth.current(),
+  jetMonth: JetMonth,
   onDateSelected: (JetDay) -> Unit,
   selectedDates: Set<JetDay>,
-  firstDayOfWeek: DayOfWeek
 ) {
   Column(
     modifier = Modifier
@@ -32,10 +33,10 @@ fun JetCalendarMonthlyView(
   ) {
     Text(
       text = jetMonth.name(),
-      style = TextStyle(fontSize = 18.sp),
+      style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium),
       modifier = Modifier.padding(8.dp)
     )
-    jetMonth.weeks(firstDayOfWeek).forEach { week ->
+    jetMonth.monthWeeks?.forEach { week ->
       Column {
         if (week.isFirstWeek) {
           WeekNames(week)
@@ -48,6 +49,33 @@ fun JetCalendarMonthlyView(
         )
       }
     }
+  }
+}
+
+@Composable
+private fun NextButton(onNext: () -> Unit) {
+  IconButton(onClick = {
+    onNext()
+  }) {
+    Icon(
+      Icons.Filled.ArrowForward,
+      "next",
+      tint = Color.Black
+    )
+  }
+}
+
+@Composable
+private fun PrevButton(onPrevious: () -> Unit) {
+  IconButton(onClick = {
+    onPrevious()
+
+  }) {
+    Icon(
+      Icons.Filled.ArrowBack,
+      "previous",
+      tint = Color.Black
+    )
   }
 }
 

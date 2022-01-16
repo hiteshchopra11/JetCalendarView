@@ -12,11 +12,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import dev.baseio.libjetcalendar.data.JetDay
 import dev.baseio.libjetcalendar.data.JetWeek
-import dev.baseio.libjetcalendar.data.dates
-import java.time.DayOfWeek
 
 @Composable
 fun JetCalendarWeekView(
@@ -32,7 +29,7 @@ fun JetCalendarWeekView(
     horizontalArrangement = Arrangement.Center
   ) {
 
-    week.dates().forEach { date ->
+    week.days?.forEach { date ->
       Box(
         modifier = Modifier
           .size(50.dp)

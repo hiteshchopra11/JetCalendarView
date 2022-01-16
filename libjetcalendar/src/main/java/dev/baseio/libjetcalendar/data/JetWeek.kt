@@ -9,12 +9,13 @@ import java.time.temporal.WeekFields
 import java.util.*
 
 @Parcelize
-data class JetWeek(
+class JetWeek private constructor(
   val startDate: LocalDate,
   val endDate: LocalDate,
   val monthOfWeek: Int,
   val dayOfWeek: DayOfWeek,
   val isFirstWeek: Boolean,
+  var days:List<JetDay>?=null
 ) : Parcelable, JetCalendarType() {
   fun dayNames(): List<String> {
     val days = mutableListOf<DayOfWeek>()
@@ -35,19 +36,23 @@ data class JetWeek(
         date.with(TemporalAdjusters.previousOrSame(dayOfWeek))
       val lastDayOfWeek = dayOfWeek.plus(6) // or minus(1)
       val endOfWeek: LocalDate = date.with(TemporalAdjusters.nextOrSame(lastDayOfWeek))
-      return JetWeek(startOfCurrentWeek, endOfWeek, date.monthValue, dayOfWeek, isFirstWeek)
+      val week = JetWeek(startOfCurrentWeek, endOfWeek, date.monthValue, dayOfWeek, isFirstWeek)
+      week.days = week.dates()
+      return week
     }
   }
+  fun dates(): List<JetDay> {
+    val days = mutableListOf<JetDay>()
+    days.add(startDate.toJetDay(this))
+    while (days.size != 7) {
+      days.add(days.last().nextDay(this))
+    }
+    return days
+  }
+
 }
 
-fun JetWeek.dates(): List<JetDay> {
-  val days = mutableListOf<JetDay>()
-  days.add(startDate.toJetDay(this))
-  while (days.size != 7) {
-    days.add(days.last().nextDay(this))
-  }
-  return days
-}
+
 
 fun LocalDate.toJetDay(jetWeek: JetWeek): JetDay {
   return JetDay(this, this.monthValue == jetWeek.monthOfWeek)
@@ -62,12 +67,8 @@ private fun JetDay.nextDay(jetWeek: JetWeek): JetDay {
 fun JetWeek.nextWeek(isFirstWeek: Boolean): JetWeek {
   val firstDay = this.endDate.plusDays(1)
   val lastDay = this.endDate.plusDays(7)
-  return JetWeek(
-    firstDay,
-    lastDay,
-    monthOfWeek = monthOfWeek,
-    dayOfWeek = dayOfWeek,
-    isFirstWeek = isFirstWeek
-  )
+  val week = JetWeek.current(firstDay, dayOfWeek = dayOfWeek, isFirstWeek = isFirstWeek,)
+  week.days = week.dates()
+  return week
 }
 

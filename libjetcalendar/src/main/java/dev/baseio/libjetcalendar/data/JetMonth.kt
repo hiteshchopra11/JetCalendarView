@@ -12,11 +12,17 @@ import java.util.*
 
 
 @Parcelize
-class JetMonth(val startDate: LocalDate, val endDate: LocalDate) : Parcelable, JetCalendarType() {
+class JetMonth private constructor(
+  val startDate: LocalDate,
+  val endDate: LocalDate,
+  var firstDayOfWeek: DayOfWeek,
+  var monthWeeks: List<JetWeek>? = null
+) :
+  Parcelable, JetCalendarType() {
   fun name(): String {
     return "${
       startDate.month.getDisplayName(
-        TextStyle.FULL,
+        TextStyle.SHORT,
         Locale.getDefault()
       )
     } ${startDate.year}"
@@ -24,28 +30,32 @@ class JetMonth(val startDate: LocalDate, val endDate: LocalDate) : Parcelable, J
 
 
   companion object {
-    fun current(date: LocalDate = LocalDate.now()): JetMonth {
+    fun current(date: LocalDate = LocalDate.now(), firstDayOfWeek: DayOfWeek): JetMonth {
       val startOfMonth = date.with(TemporalAdjusters.firstDayOfMonth())
       val endOfMonth = date.with(TemporalAdjusters.lastDayOfMonth())
-      return JetMonth(startOfMonth, endOfMonth)
+      val month =  JetMonth(startOfMonth, endOfMonth, firstDayOfWeek = firstDayOfWeek)
+      month.monthWeeks = month.weeks(firstDayOfWeek)
+      return month
     }
   }
+
+  private fun weeks(firstDayOfWeek: DayOfWeek): List<JetWeek> {
+    val currentYearMonth: YearMonth = YearMonth.of(this.endDate.year, this.endDate.monthValue)
+    val weeks = currentYearMonth.atEndOfMonth().get(WeekFields.of(firstDayOfWeek, 1).weekOfMonth())
+    val monthWeeks = mutableListOf<JetWeek>()
+    monthWeeks.add(
+      JetWeek.current(
+        startDate,
+        isFirstWeek = true,
+        dayOfWeek = this.firstDayOfWeek
+      )
+    )
+    while (monthWeeks.size != weeks) {
+      monthWeeks.add(monthWeeks.last().nextWeek(isFirstWeek = false))
+    }
+    return monthWeeks
+  }
+
 }
 
-fun JetMonth.weeks(firstDayOfWeek: DayOfWeek): List<JetWeek> {
-  val currentYearMonth: YearMonth = YearMonth.of(this.endDate.year, this.endDate.monthValue)
-  val weeks = currentYearMonth.atEndOfMonth().get(WeekFields.of(firstDayOfWeek, 1).weekOfMonth())
-  val monthWeeks = mutableListOf<JetWeek>()
-  monthWeeks.add(
-    JetWeek.current(
-      this@weeks.startDate,
-      isFirstWeek = true,
-      dayOfWeek = firstDayOfWeek
-    )
-  )
-  while (monthWeeks.size != weeks) {
-    monthWeeks.add(monthWeeks.last().nextWeek(isFirstWeek = false))
-  }
-  return monthWeeks
-}
 

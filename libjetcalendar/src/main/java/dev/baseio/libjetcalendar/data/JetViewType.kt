@@ -7,7 +7,7 @@ enum class JetViewType {
   YEARLY;
 
   fun next(): JetViewType {
-    if (ordinal == 3) {
+    if (ordinal == values().size.minus(1)) {
       return MONTHLY
     }
     return values()[ordinal + 1]

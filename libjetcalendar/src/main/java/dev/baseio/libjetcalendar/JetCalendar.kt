@@ -3,8 +3,6 @@ package dev.baseio.libjetcalendar
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import dev.baseio.libjetcalendar.biweekly.JetCalendarBiWeeklyView
 import dev.baseio.libjetcalendar.data.*
 import dev.baseio.libjetcalendar.monthly.JetCalendarMonthlyView
@@ -19,7 +17,7 @@ import java.util.*
 @Composable
 fun JetCalendar(
   modifier: Modifier,
-  viewType: JetViewType = JetViewType.BI_WEEKLY,
+  viewType: JetViewType = JetViewType.YEARLY,
   firstDayOfWeek: DayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek,
   today: LocalDate = LocalDate.now(),
   onDateSelected: (JetDay) -> Unit,
@@ -27,10 +25,9 @@ fun JetCalendar(
 ) {
   when (viewType) {
     JetViewType.MONTHLY -> JetCalendarMonthlyView(
-      jetMonth = JetMonth.current(today),
+      jetMonth = JetMonth.current(today, firstDayOfWeek),
       onDateSelected = onDateSelected,
       selectedDates = selectedDates,
-      firstDayOfWeek = firstDayOfWeek
     )
     JetViewType.WEEKLY -> Column {
       Column {
@@ -50,7 +47,7 @@ fun JetCalendar(
       selectedDates = selectedDates,
     )
     JetViewType.YEARLY -> {
-      val year = JetYear.current(today)
+      val year = JetYear.current(today, firstDayOfWeek)
       JetCalendarYearlyView(
         startingYear = year,
         onDateSelected, selectedDates,

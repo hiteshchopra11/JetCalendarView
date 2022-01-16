@@ -5,7 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -37,10 +36,11 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun CalendarExample() {
-  var stateFlow by rememberSaveable { mutableStateOf(setOf<JetDay>()) }
+  var selectionState by rememberSaveable { mutableStateOf(setOf<JetDay>()) }
   var viewTypeFlow by remember {
     mutableStateOf(JetViewType.YEARLY)
   }
+
   Surface(color = MaterialTheme.colors.background) {
     Scaffold(topBar = {
       TopAppBar(title = {
@@ -51,7 +51,7 @@ fun CalendarExample() {
       }, actions = {
         IconButton(modifier = Modifier.then(Modifier.padding(8.dp)),
           onClick = {
-            stateFlow = hashSetOf()
+            selectionState = hashSetOf()
           }, content = {
             Icon(
               Icons.Filled.Clear,
@@ -72,11 +72,11 @@ fun CalendarExample() {
       })
     }) {
       JetCalendar(modifier = Modifier, viewType = viewTypeFlow, onDateSelected = { jetDay ->
-        stateFlow = hashSetOf<JetDay>().apply {
-          addAll(stateFlow)
+        selectionState = hashSetOf<JetDay>().apply {
+          addAll(selectionState)
           add(jetDay)
         }
-      }, selectedDates = stateFlow)
+      }, selectedDates = selectionState)
     }
   }
 

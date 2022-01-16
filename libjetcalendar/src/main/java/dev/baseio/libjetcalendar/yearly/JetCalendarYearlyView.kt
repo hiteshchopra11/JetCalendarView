@@ -1,15 +1,13 @@
 package dev.baseio.libjetcalendar.yearly
 
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.*
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.listSaver
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.paging.*
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -20,32 +18,38 @@ import java.time.DayOfWeek
 
 @Composable
 fun JetCalendarYearlyView(
-  startingYear: JetYear = JetYear.current(),
+  startingYear: JetYear,
   onDateSelected: (JetDay) -> Unit,
   selectedDates: Set<JetDay>,
   firstDayOfWeek: DayOfWeek,
 ) {
   val monthsPager = Pager(PagingConfig(12)) {
-    JetPagingSource(startingYear.startDate)
+    JetPagingSource(startingYear.startDate,firstDayOfWeek)
   }
   val lazyPagingMonths = monthsPager.flow.collectAsLazyPagingItems()
   // affected by https://stackoverflow.com/questions/69739108/how-to-save-paging-state-of-lazycolumn-during-navigation-in-jetpack-compose
   val listState = rememberLazyListState(startingYear.currentMonthPosition())
 
-  YearViewInternal(listState, lazyPagingMonths, onDateSelected, selectedDates, firstDayOfWeek)
+  YearViewInternal(
+    listState,
+    lazyPagingMonths,
+    onDateSelected,
+    selectedDates,
+    firstDayOfWeek
+  )
 }
 
 
 @Composable
 private fun YearViewInternal(
   listState: LazyListState,
-  pagedMonths: LazyPagingItems<JetMonth>,
+  pagedMonths: LazyPagingItems<JetYear>,
   onDateSelected: (JetDay) -> Unit,
   selectedDates: Set<JetDay>,
   firstDayOfWeek: DayOfWeek
 ) {
   when (pagedMonths.itemCount) {
-    0 -> CircularProgressIndicator()
+    0 -> CircularProgressIndicator(color = Color.Black, modifier = Modifier.padding(8.dp))
     else -> {
       LazyColumn(
         state = listState,
@@ -53,14 +57,39 @@ private fun YearViewInternal(
           .fillMaxWidth()
           .fillMaxHeight()
       ) {
-
-        items(pagedMonths) { month ->
-          JetCalendarMonthlyView(month!!, onDateSelected, selectedDates, firstDayOfWeek)
-        }
+        calendarMonths(
+          pagedMonths,
+          onDateSelected,
+          selectedDates,
+          firstDayOfWeek
+        )
       }
     }
   }
 
+}
+
+private fun LazyListScope.calendarMonths(
+  pagedYears: LazyPagingItems<JetYear>,
+  onDateSelected: (JetDay) -> Unit,
+  selectedDates: Set<JetDay>,
+  firstDayOfWeek: DayOfWeek,
+) {
+  items(pagedYears) { year ->
+    Box(
+      modifier = Modifier.fillParentMaxWidth()
+    ) {
+      Column {
+        year?.yearMonths?.forEach { month ->
+          JetCalendarMonthlyView(month, onDateSelected, selectedDates)
+        }
+      }
+    }
+  }
+}
+
+private fun JetMonth?.year(): String {
+  return "${this?.startDate?.year}"
 }
 
 
