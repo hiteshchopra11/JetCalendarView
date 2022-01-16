@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -79,25 +78,3 @@ private fun LazyListScope.calendarMonths(
     }
   }
 }
-
-private fun JetMonth?.year(): String {
-  return "${this?.startDate?.year}"
-}
-
-
-@Composable
-private fun lazyListStateSaver(lazyListState: LazyListState) =
-  listSaver<LazyListState, Int>(
-    save = {
-      listOf(
-        lazyListState.firstVisibleItemIndex,
-        lazyListState.firstVisibleItemScrollOffset
-      )
-    },
-    restore = {
-      LazyListState(
-        firstVisibleItemIndex = it[0],
-        firstVisibleItemScrollOffset = it[1]
-      )
-    }
-  )
